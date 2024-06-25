@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // read email html
-const welcome2 = fs.readFileSync('./emails/welcome2.html', 'utf8');
+const welcome3 = fs.readFileSync('./emails/welcome3.html', 'utf8');
 
 
 // API endpoint to collect contact form data
@@ -72,8 +72,8 @@ app.post('/api/contact', async (req, res) => {
       from: process.env.GMAIL_USER,
       to: email,
       subject: 'Thank you for your submission',
-      html: welcome2.replace('{(name)}', name),
-      //text: `Dear ${name},\n\nThank you for reaching out to us. We have received your message and will get back to you shortly.\n\nBest regards,\nThe Gourmology Team`
+      html: welcome3.replace('{(name)}', name.split(' ')[0]),
+      //text: `Dear ${name},\n\n.Thank you for reaching out to us. We have received your message and will get back to you shortly\n\nBest regards,\nThe Gourmology Team`
     };
 
     // Send emails and log results
@@ -100,6 +100,49 @@ app.post('/api/contact', async (req, res) => {
   }
 });
   
+
+// API endpoint for newsletter sign-ups
+app.post('/api/newsletter-signup', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).send('Email is required');
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('newsletter_signups')
+      .insert([{ email }]);
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      throw error;
+    }
+
+    // Send welcome email to the new subscriber
+    const mailOptionsToUser = {
+      from: process.env.GMAIL_USER,
+      to: email,
+      subject: 'Welcome to Our Newsletter!',
+      html: welcome3.replace('{(name)}', 'Subscriber'), // Adjust as needed if you want to personalize it
+    };
+
+    try {
+      await transporter.sendMail(mailOptionsToUser);
+      console.log('Welcome email sent successfully');
+    } catch (error) {
+      console.error('Error sending welcome email:', error);
+    }
+
+    res.status(201).send('Email saved successfully and welcome email sent');
+  } catch (error) {
+    console.error('Error saving email or sending welcome email:', error);
+    res.status(500).send('Error saving email or sending welcome email');
+  }
+});
+
+
+
 
 // New API endpoint to get Cloudflare image URL
 app.get('/api/get-cloudflare-image', async (req, res) => {
