@@ -11,7 +11,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://gourmology.com', // Your custom domain
+  optionsSuccessStatus: 200, // For older browsers support
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Initialize Supabase client
