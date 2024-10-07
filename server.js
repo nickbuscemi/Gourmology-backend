@@ -15,7 +15,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+// const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
 
 // nodemailer config
 const transporter = nodemailer.createTransport({
@@ -24,16 +24,17 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-      user: "nick.buscemi13@gmail.com", // Your email
-      pass: "sglawjaksktpwwrg" // Your app password
+      user: process.env.GMAIL_USER, // Your email
+      pass: process.env.GMAIL_APP_PASS // Your app password
   }
-});
+}); 
+
+
 
 // read email html
 const welcome3 = fs.readFileSync('./emails/welcome3.html', 'utf8');
 
 
-// API endpoint to collect contact form data
 app.post('/api/contact', async (req, res) => {
   console.log('Received request to /api/contact'); // Log when endpoint is hit
 
@@ -42,29 +43,32 @@ app.post('/api/contact', async (req, res) => {
   try {
     console.log('Inserting data into Supabase');
 
-    const { data, error } = await supabase
-      .from('contact_submissions')
-      .insert([{ 
-        name, 
-        email, 
-        phone, 
-        eventDate: new Date(eventDate), // Ensure the eventDate is a Date object
-        message 
-      }]);
+    /* const { data, error } = await supabase
+       .from('contact_submissions')
+       .insert([{ 
+         name, 
+         email, 
+         phone, 
+         eventDate: new Date(eventDate), // Ensure the eventDate is a Date object
+         message 
+       }]);
 
     if (error) {
       console.error('Supabase insert error:', error);
       throw error;
     }
 
-    console.log('Supabase insert successful:', data);
+    console.log('Supabase insert successful:', data); */
+
+    // Send success response before sending emails
+    res.status(201).send('Contact information saved successfully and emails will be sent shortly');
 
     // Send email to yourself
     const mailOptionsToSelf = {
-      from: process.env.GMAIL_USER, // Your email
+      from: process.env.GMAIL_USER,
       to: process.env.GMAIL_USER,
       subject: 'New Contact Form Submission',
-      text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Date: ${eventDate}\nMessage: ${message}`
+      text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Date: ${eventDate}\nMessage: ${message}`,
     };
 
     // Send confirmation email to user
@@ -73,32 +77,32 @@ app.post('/api/contact', async (req, res) => {
       to: email,
       subject: 'Thank you for your submission',
       html: welcome3.replace('{(name)}', name.split(' ')[0]),
-      //text: `Dear ${name},\n\n.Thank you for reaching out to us. We have received your message and will get back to you shortly\n\nBest regards,\nThe Gourmology Team`
     };
 
-    // Send emails and log results
-    try {
-      console.log('Sending email to self');
-      await transporter.sendMail(mailOptionsToSelf);
-      console.log('Email to self sent successfully');
-    } catch (error) {
-      console.error('Error sending email to self:', error);
-    }
+    // Send emails in the background
+    setTimeout(async () => {
+      try {
+        console.log('Sending email to self');
+        await transporter.sendMail(mailOptionsToSelf);
+        console.log('Email to self sent successfully');
+      } catch (error) {
+        console.error('Error sending email to self:', error);
+      }
 
-    try {
-      console.log('Sending confirmation email to user');
-      await transporter.sendMail(mailOptionsToUser);
-      console.log('Confirmation email sent to user successfully');
-    } catch (error) {
-      console.error('Error sending confirmation email to user:', error);
-    }
-
-    res.status(201).send('Contact information saved successfully and emails sent');
+      try {
+        console.log('Sending confirmation email to user');
+        await transporter.sendMail(mailOptionsToUser);
+        console.log('Confirmation email sent to user successfully');
+      } catch (error) {
+        console.error('Error sending confirmation email to user:', error);
+      }
+    }, 0);
   } catch (error) {
     console.error('Error saving contact information or sending emails:', error);
     res.status(500).send('Error saving contact information or sending emails');
   }
 });
+
   
 
 // API endpoint for newsletter sign-ups
@@ -110,14 +114,14 @@ app.post('/api/newsletter-signup', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    /*const { data, error } = await supabase
       .from('newsletter_signups')
       .insert([{ email }]);
 
     if (error) {
       console.error('Supabase insert error:', error);
       throw error;
-    }
+    }*/
 
     // Send welcome email to the new subscriber
     const mailOptionsToUser = {
