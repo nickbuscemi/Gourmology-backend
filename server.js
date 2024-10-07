@@ -103,7 +103,11 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-  
+
+app.get('/', (req, res) => {
+  res.send('Hello, this is your backend running successfully!');
+});
+
 
 // API endpoint for newsletter sign-ups
 app.post('/api/newsletter-signup', async (req, res) => {
