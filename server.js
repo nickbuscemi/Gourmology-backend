@@ -68,10 +68,10 @@ app.post('/api/contact', async (req, res) => {
     // Send success response before sending emails
     res.status(201).send('Contact information saved successfully and emails will be sent shortly');
 
-    // Send email to yourself
-    const mailOptionsToSelf = {
+    // Send email to Gourmology
+    const mailOptionsToGourmology = {
       from: process.env.GMAIL_USER,
-      to: process.env.GMAIL_USER,
+      to: 'gourmology18@gmail.com', // Changed to Gourmology email
       subject: 'New Contact Form Submission',
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Date: ${eventDate}\nMessage: ${message}`,
     };
@@ -79,7 +79,7 @@ app.post('/api/contact', async (req, res) => {
     // Send confirmation email to user
     const mailOptionsToUser = {
       from: process.env.GMAIL_USER,
-      to: email,
+      to: email, // This sends to the user's email address
       subject: 'Thank you for your submission',
       html: welcome3.replace('{(name)}', name.split(' ')[0]),
     };
@@ -87,11 +87,11 @@ app.post('/api/contact', async (req, res) => {
     // Send emails in the background
     setTimeout(async () => {
       try {
-        console.log('Sending email to self');
-        await transporter.sendMail(mailOptionsToSelf);
-        console.log('Email to self sent successfully');
+        console.log('Sending email to Gourmology');
+        await transporter.sendMail(mailOptionsToGourmology);
+        console.log('Email to Gourmology sent successfully');
       } catch (error) {
-        console.error('Error sending email to self:', error);
+        console.error('Error sending email to Gourmology:', error);
       }
 
       try {
