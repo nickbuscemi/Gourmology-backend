@@ -28,10 +28,14 @@ const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
+  /*auth: {
+      user: process.env.GMAIL_USER, // NICK email
+      pass: process.env.GMAIL_APP_PASS // NICK app password
+  },*/
   auth: {
-      user: process.env.GMAIL_USER, // Your email
-      pass: process.env.GMAIL_APP_PASS // Your app password
-  }
+    user: process.env.GOURMOLOGY_GMAIL_USER, // GOURMOLOGY email
+    pass: process.env.GOURMOLOGY_GMAIL_APP_PASS // GOURMOLOGY app password
+}
 }); 
 
 
@@ -70,7 +74,7 @@ app.post('/api/contact', async (req, res) => {
 
     // Send email to Gourmology
     const mailOptionsToGourmology = {
-      from: process.env.GMAIL_USER,
+      from: process.env.GOURMOLOGY_GMAIL_USER,
       to: 'gourmology18@gmail.com', // Changed to Gourmology email
       subject: 'New Contact Form Submission',
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Date: ${eventDate}\nMessage: ${message}`,
@@ -78,7 +82,7 @@ app.post('/api/contact', async (req, res) => {
 
     // Send confirmation email to user
     const mailOptionsToUser = {
-      from: process.env.GMAIL_USER,
+      from: process.env.GOURMOLOGY_GMAIL_USER,
       to: email, // This sends to the user's email address
       subject: 'Thank you for your submission',
       html: welcome3.replace('{(name)}', name.split(' ')[0]),
