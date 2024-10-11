@@ -138,7 +138,7 @@ app.post('/api/newsletter-signup', async (req, res) => {
 
     // Send welcome email to the new subscriber
     const mailOptionsToUser = {
-      from: process.env.GMAIL_USER,
+      from: process.env.GOURMOLOGY_GMAIL_USER,
       to: email,
       subject: 'Welcome to Our Newsletter!',
       html: welcome3.replace('{(name)}', 'Subscriber'), // Adjust as needed if you want to personalize it
