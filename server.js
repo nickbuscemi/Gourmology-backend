@@ -12,9 +12,11 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 const corsOptions = {
-  origin: 'https://gourmology.com', // Your custom domain
+  origin: ['https://gourmology.com', 'http://localhost:5173'], // Add localhost for development
   optionsSuccessStatus: 200, // For older browsers support
 };
+
+
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
